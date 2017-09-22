@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru" >
+<head>
+    <meta charset="utf-8" />
+    <title>Vue — прогрессивный фреймворк</title>
+    <link rel="stylesheet" href="/css/font-awesome.css">
+    <script src="https://unpkg.com/vue"></script>
+  <style>
+    .arh {
+      cursor: pointer;
+    }
+    .arh:after {
+      content: ' -> ';
+      font-family: monospace;
+    }
+    .st1 {
+      width: 90px;
+      text-align: center;
+      /*height: 48px;
+      
+      border-radius: 50%;*/
+      box-shadow: inset 1px 1px 4px #555, inset -1px -1px 4px #555;
+      padding: 5px;
+    }
+    .delitem {
+      border: 1px solid #bbb;
+      border-radius: 2px;
+      padding: 0 6px;
+      background: linear-gradient(to top, #ccc, #fff);
+      font-family: monospace;
+    }
+    .delitem:hover {
+      border: 1px solid #999;
+      background: linear-gradient(to top, #fff, #ccc);
+    }
+    .delitem a {
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+<div id="vue1">
+  <h1 v-bind:title="message">{{txt1}}</h1>
+  <p>Напишите свой привет: <input type="text" v-model="txt1"> </p>
+  <button v-on:click="reverseTxt">Reverse Hello</button>
+  <p><span class="arh" v-on:click="hv">{{txt_hv}}</span>
+    <span v-show="pokaz"> Сейчас меня видно</span></p>
+  <ol>Работа со списком: <input type="text" v-model="newItem" @keyup.enter="addItem" placeholder="Новый пункт">
+   <button v-on:click="addItem">Add item</button>
+    <li v-for="(item, index) in dds"><span class="delitem">
+      <a href="javascript:void('0')" @click="dds.splice(index,1)" title="Удалить запись" style=""> X</a></span> 
+      {{ item.pt }}
+    </li>
+  </ol>
+  <p><i class="fa fa-refresh fa-3x fa-fw" :class="{ 'fa-spin' : !isSpin }"  @click="isSpin = !isSpin"></i>Кликни по иконке...</p>
+  <div class="st1"
+     v-bind:class="{ 'fa-spin' : isSpin }">Plain text
+</div>
+</div>
+<hr>
+<h2>Пример с использованием компонента.</h2> 
+<p>Шаблон компонента я переделал на таблицу, добавил поле с номером и запретил внесение пустыx строк в список заданий.</p>
+<div id="todo-table">
+  <input
+    v-model="newTodoText"
+    v-on:keyup.enter="addNewTodo"
+    placeholder="Добавить задание"
+  >
+  <table>
+    <tr
+      is="todo-row"
+      v-for="(todo, ind) in todos"
+      v-bind:key="todo.id" 
+      v-bind:idx="todo.id"
+      v-bind:title="todo.title"
+      v-on:del_row="todos.splice(ind, 1)"
+    ></tr>
+  </table>
+</div>
+=================================================
+<script>
+Vue.component('todo-row', {
+  template: '<tr><td>{{ idx }}</td>\
+      <td>{{ title }}</td>\
+      <td><button class="delitem" v-on:click="$emit(\'del_row\')">X</button></td>\
+    </tr>\
+  ',
+  props: ['title','idx']
+})
+var tab_todo = new Vue({
+  el: '#todo-table',
+  data: {
+    newTodoText: '',
+    todos: [
+      {
+        id: 1,
+        title: 'Выучить Vue.js'
+      },
+      {
+        id: 2,
+        title: 'Написать пример'
+      },
+      {
+        id: 3,
+        title: 'Выпить пива'
+      }
+    ],
+    nextTodoId: 4
+  },
+  methods: {
+    addNewTodo: function () {
+      if (this.newTodoText.length>0){
+        this.todos.push({
+          id: this.nextTodoId++,
+          title: this.newTodoText
+        })
+        this.newTodoText = ''
+      }
+    }
+  }
+})
+//================================
+  var my_vue = new Vue ({
+    el: '#vue1',
+    data: {
+      txt1: 'Hello Vue.js ;-)',
+      txt_hv: 'Показать скрытый текст',
+      message: 'Вот когда вы загрузили эту страницу: ' + new Date().toLocaleString(),
+      ffa: 'fa fa-refresh fa-3x fa-fw',
+      pokaz: false,
+      isSpin: false,
+      dds: [
+        { pt: 'Посадить дерево' },
+        { pt: 'Построить дом' },
+        { pt: 'Вырастить сына' } ],
+      newItem: ''
+    },
+    methods: {
+      rem: function (i) {
+        this.dds.splice(i,1)
+      },
+      reverseTxt: function () {
+        my_vue.txt1 = this.txt1.split('').reverse().join('')
+      },
+      addItem: function () {
+        if (this.newItem.length>0) {
+            this.dds.push({pt: this.newItem })
+            this.newItem = ''
+          } else { alert('Нужен текст!') }
+      },
+      hv: function (){
+        if (my_vue.pokaz) {
+          this.pokaz=false;
+          this.txt_hv = 'Показать скрытый текст';
+        } else {
+          this.pokaz=true;
+          this.txt_hv = '<!--не пашет-->Cкрыть текст ';
+        }
+      }
+    }
+  })
+</script>
+</body></html>
